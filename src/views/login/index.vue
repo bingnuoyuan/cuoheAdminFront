@@ -75,7 +75,7 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: '111111'
+        password: '123456'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -107,7 +107,6 @@ export default {
     },
     accoutValid(){
       let that = this;
-      // console.log('this.loginForm.username', this.loginForm.username)
       account(this.loginForm.username).then((res) =>{
         console.log(res)
         return res.data.password == that.loginForm.password
@@ -118,10 +117,7 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          // let _result = this.accoutValid();
           account(this.loginForm.username).then((res) =>{
-            // console.log(res)
-            // return res.data.password == that.loginForm.password;
             if(res.data.password == that.loginForm.password){
               this.$store.dispatch('user/login', this.loginForm).then(() => {
                 this.$router.push({ path: this.redirect || '/' })
@@ -146,8 +142,6 @@ export default {
 </script>
 
 <style lang="scss">
-/* 修复input 背景不协调 和光标变色 */
-/* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
 $bg:#283443;
 $light_gray:#fff;

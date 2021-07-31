@@ -1,16 +1,17 @@
 <template>
   <div class="add-page">
     <el-form ref="product" :model="product" :rules="rules">
-      <el-form-item label="商品类别:" required prop="item">
-        <el-select v-model="product.item" multiple placeholder="请选择" @change="handlePid">
-          <el-option
-            v-for="item in ItemList"
-            :key="item.pid"
-            :label="item.itemName"
-            :value="item.itemName">
-          </el-option>
-        </el-select>
-        <!-- <el-button type="primary" @click="addItem">新增</el-button> -->
+      <el-form-item label="品牌logo" required prop="logo">
+        <el-avatar v-if="brandLogo[0].download_url"  shape="square" :size="50" fit="fill" :src="brandLogo[0].download_url"></el-avatar>
+        <el-upload
+          class="upload-demo"
+          :action="uploadUrl" 
+          :on-success="uploadSuccess"
+          :show-file-list="false"
+      >
+          <el-button v-if="!loadImg.download_url" size="small" type="primary">点击上传</el-button>
+          <el-avatar v-else shape="square" :size="50" fit="fill" :src="loadImg.download_url"></el-avatar>
+      </el-upload>
       </el-form-item>
       <el-form-item label="商品品牌" required prop="brand">
         <el-input v-model="product.brand"></el-input>
@@ -66,12 +67,17 @@
 import { fetchById, add } from '@/api/product'
 import { itemList } from '@/api/item'
 import Tinymce from '@/components/Tinymce'
+import { avatarById } from '@/api/avatar'
+let _baseURL = 'http://localhost:45236'
 export default {
   data() {
     return {
       list: [],
       product:{},
       ItemList:[],
+      brandLogo: [{}],
+      uploadUrl:`${_baseURL}/avatar/upload`,
+      loadImg: {},
       pid: [],
       centerDialogVisible:false,
       content: '',
@@ -99,9 +105,29 @@ export default {
   },
   components: {Tinymce},
   created() {
-    this.getItemList();
+
   },
   methods: {
+    uploadSuccess(res) {
+      if (res.id_list.length > 0) {
+        this.$message({
+        message: '上传成功',
+        type: 'success'
+        })
+        this.getAvatar(res.id_list[0])
+      }   
+    },
+    getAvatar(id){
+        let that = this;
+        avatarById({
+            _id: id
+        }).then(res => {
+            console.log("avatar",res)
+            if(res.data){
+                that.loadImg = res.data[0]
+            }
+        })
+    },
     handlePid(e){
       console.log('handlePid', e)
       let that = this;
